@@ -1247,7 +1247,7 @@ class SettingsRepository(private val context: Context, private val localeStore: 
     }
 
     val navSize: Flow<NavSize> = prefsFlow { prefs ->
-        prefs[Keys.NAV_SIZE]?.let { runCatching { NavSize.valueOf(it) }.getOrNull() } ?: NavSize.COMPACT
+        prefs[Keys.NAV_SIZE]?.let { runCatching { NavSize.valueOf(it) }.getOrNull() } ?: NavSize.NORMAL
     }
 
     suspend fun setNavSize(size: NavSize) {

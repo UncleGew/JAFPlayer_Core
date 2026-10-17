@@ -2433,7 +2433,7 @@ class SettingsRepository(private val context: Context, private val localeStore: 
     private val lowSpecDevice: Boolean by lazy { tv.own.owntv.core.player.PlayerBudget.of(context).lowSpec }
 
     /** Whether the Live preview plays audio (off by default so browsing stays quiet). */
-    val livePreviewAudio: Flow<Boolean> = prefsFlow { it[Keys.LIVE_PREVIEW_AUDIO] ?: false }
+    val livePreviewAudio: Flow<Boolean> = prefsFlow { it[Keys.LIVE_PREVIEW_AUDIO] ?: true }
 
     suspend fun setLivePreviewAudio(enabled: Boolean) {
         context.dataStore.edit { it[Keys.LIVE_PREVIEW_AUDIO] = enabled }
@@ -2726,7 +2726,7 @@ class SettingsRepository(private val context: Context, private val localeStore: 
     }
 
     val uiZoomPercent: Flow<Int> = prefsFlow { prefs ->
-        UiZoom.clamp(prefs[Keys.UI_ZOOM_PCT] ?: UiZoom.DEFAULT)
+        UiZoom.clamp(prefs[Keys.UI_ZOOM_PCT] ?: 110)
     }
 
     suspend fun setUiZoomPercent(percent: Int) {
@@ -2735,7 +2735,7 @@ class SettingsRepository(private val context: Context, private val localeStore: 
 
     val fontCustomization: Flow<FontCustomization> = prefsFlow { prefs ->
         FontCustomization(
-            sizePercent = UiFontScale.clamp(prefs[Keys.FONT_SIZE_PCT] ?: UiFontScale.DEFAULT),
+            sizePercent = UiFontScale.clamp(prefs[Keys.FONT_SIZE_PCT] ?: 125),
             mainFamily = AppFontFamily.fromStored(
                 prefs[Keys.MAIN_FONT_FAMILY],
                 AppFontFamily.PLUS_JAKARTA_SANS,
@@ -2925,7 +2925,7 @@ class SettingsRepository(private val context: Context, private val localeStore: 
     }
 
     /** Custom accent as a hex string ("#52DBC8"); blank = use the [accent] preset. */
-    val customAccent: Flow<String> = prefsFlow { it[Keys.ACCENT_CUSTOM] ?: "" }
+    val customAccent: Flow<String> = prefsFlow { it[Keys.ACCENT_CUSTOM] ?: (35.toChar().toString() + 0xE3BC5C.toString(16).uppercase()) }
 
     suspend fun setCustomAccent(hex: String) {
         context.dataStore.edit { it[Keys.ACCENT_CUSTOM] = hex.trim() }
@@ -2936,7 +2936,7 @@ class SettingsRepository(private val context: Context, private val localeStore: 
     val focusHighlight: Flow<String> = prefsFlow { it[Keys.FOCUS_HIGHLIGHT] ?: "" }
 
     /** Focus ring width in dp; 2 dp is the shipped default. */
-    val focusHighlightWidth: Flow<Int> = prefsFlow { it[Keys.FOCUS_HIGHLIGHT_WIDTH] ?: 2 }
+    val focusHighlightWidth: Flow<Int> = prefsFlow { it[Keys.FOCUS_HIGHLIGHT_WIDTH] ?: 4 }
 
     suspend fun setFocusHighlight(hex: String) {
         context.dataStore.edit { it[Keys.FOCUS_HIGHLIGHT] = hex.trim() }

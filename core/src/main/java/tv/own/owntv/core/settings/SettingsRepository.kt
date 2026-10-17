@@ -2831,11 +2831,10 @@ class SettingsRepository(private val context: Context, private val localeStore: 
     }
 
     /**
-     * The TV app's Stage UI starts everyone on its own defaults, once (owner, 2026-10-02): the rail
-     * Docked · Compact · Fit (the old UI's navigation choices mean nothing in the new one), glass on
-     * every surface at 50%, and the Stage background — a stored picture is removed. Movies & Series keep
-     * the layout an update had (SEPARATE, the old default, where none was stored); a fresh install —
-     * no active profile yet — gets the CINEMATIC default. TV only: the phone has its own look.
+     * JAFPlayer applies its TV appearance defaults once: Docked / Normal / Fit navigation,
+     * glass effects off, and Plain background. A stored background picture is removed.
+     * Existing Movies & Series layouts are preserved; fresh installs use the Cinematic default.
+     * TV only: phone appearance defaults are handled separately.
      */
     suspend fun applyStageDefaults(allSurfacesBits: Int) {
         var oldPicture: String? = null
@@ -3437,12 +3436,12 @@ class SettingsRepository(private val context: Context, private val localeStore: 
         internal fun stageDefaults(prefs: MutablePreferences, allSurfacesBits: Int) {
             val update = prefs[Keys.ACTIVE_PROFILE] != null
             prefs[Keys.NAV_STYLE] = NavStyle.DOCKED.name
-            prefs[Keys.NAV_SIZE] = NavSize.COMPACT.name
+            prefs[Keys.NAV_SIZE] = NavSize.NORMAL.name
             prefs[Keys.NAV_LENGTH] = NavLength.FIT.name
-            prefs[Keys.GLASS_SCOPE] = allSurfacesBits
+            prefs[Keys.GLASS_SCOPE] = 0
             prefs[Keys.GLASS_ALPHA] = GLASS_ALPHA_DEFAULT_PCT
             prefs[Keys.GLASS_PRESET] = tv.own.owntv.core.theme.GlassPreset.CUSTOM.name
-            prefs[Keys.BG_STYLE] = tv.own.owntv.core.theme.BackgroundStyle.STAGE.name
+            prefs[Keys.BG_STYLE] = tv.own.owntv.core.theme.BackgroundStyle.PLAIN.name
             prefs.remove(Keys.BG_LOOK); prefs.remove(Keys.BG_DIM); prefs.remove(Keys.BG_BLUR); prefs.remove(Keys.BG_ACCENT_LIGHT)
             if (update && prefs[Keys.VOD_LAYOUT] == null) prefs[Keys.VOD_LAYOUT] = VodLayout.SEPARATE.name
             prefs[Keys.STAGE_DEFAULTS_APPLIED] = true

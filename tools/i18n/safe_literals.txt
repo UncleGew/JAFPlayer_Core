@@ -94,6 +94,7 @@
 5	technical	core/src/main/java/tv/own/owntv/core/backup/BackupManager.kt	d
 3	json	core/src/main/java/tv/own/owntv/core/backup/BackupManager.kt	defaultSourceId
 4	json	core/src/main/java/tv/own/owntv/core/backup/BackupManager.kt	device
+3	json	core/src/main/java/tv/own/owntv/core/backup/BackupManager.kt	enabled
 1	log	core/src/main/java/tv/own/owntv/core/backup/BackupManager.kt	encrypted=${crypto != null} key=${key != null} profiles=${fileProfiles.length()} sources=${fileSources.length()}
 2	json	core/src/main/java/tv/own/owntv/core/backup/BackupManager.kt	epgAutoRefresh
 2	json	core/src/main/java/tv/own/owntv/core/backup/BackupManager.kt	epgSources
@@ -559,6 +560,7 @@
 1	room-schema	core/src/main/java/tv/own/owntv/core/database/OwnTVDatabase.kt	ALTER TABLE `series` ADD COLUMN `contentHash` INTEGER NOT NULL DEFAULT 0
 1	room-schema	core/src/main/java/tv/own/owntv/core/database/OwnTVDatabase.kt	ALTER TABLE `series` ADD COLUMN `episodesSyncedAt` INTEGER NOT NULL DEFAULT 0
 1	sql	core/src/main/java/tv/own/owntv/core/database/OwnTVDatabase.kt	ALTER TABLE `sources` ADD COLUMN `$column` $type
+1	sql	core/src/main/java/tv/own/owntv/core/database/OwnTVDatabase.kt	ALTER TABLE `sources` ADD COLUMN `enabled` INTEGER NOT NULL DEFAULT 1
 1	sql	core/src/main/java/tv/own/owntv/core/database/OwnTVDatabase.kt	ALTER TABLE `sources` ADD COLUMN `importPortalEpg` INTEGER NOT NULL DEFAULT 1
 1	sql	core/src/main/java/tv/own/owntv/core/database/OwnTVDatabase.kt	ALTER TABLE `sources` ADD COLUMN `livePrerollSecs` INTEGER NOT NULL DEFAULT -1
 1	room-schema	core/src/main/java/tv/own/owntv/core/database/OwnTVDatabase.kt	ALTER TABLE `sources` ADD COLUMN `mac` TEXT
@@ -850,6 +852,7 @@
 4	room-schema	core/src/main/java/tv/own/owntv/core/database/OwnTVDatabase.kt	contentHash
 1	room-schema	core/src/main/java/tv/own/owntv/core/database/OwnTVDatabase.kt	directSource
 1	room-schema	core/src/main/java/tv/own/owntv/core/database/OwnTVDatabase.kt	drmConfig
+1	room-schema	core/src/main/java/tv/own/owntv/core/database/OwnTVDatabase.kt	enabled
 4	log	core/src/main/java/tv/own/owntv/core/database/OwnTVDatabase.kt	epg_channels
 2	room-schema	core/src/main/java/tv/own/owntv/core/database/OwnTVDatabase.kt	epg_programmes
 3	room-schema	core/src/main/java/tv/own/owntv/core/database/OwnTVDatabase.kt	episodes
@@ -875,7 +878,7 @@
 1	room-schema	core/src/main/java/tv/own/owntv/core/database/OwnTVDatabase.kt	series_fts
 1	room-schema	core/src/main/java/tv/own/owntv/core/database/OwnTVDatabase.kt	serverTimeZone
 1	sql	core/src/main/java/tv/own/owntv/core/database/OwnTVDatabase.kt	sourceId
-18	sql	core/src/main/java/tv/own/owntv/core/database/OwnTVDatabase.kt	sources
+19	room-schema	core/src/main/java/tv/own/owntv/core/database/OwnTVDatabase.kt	sources
 1	room-schema	core/src/main/java/tv/own/owntv/core/database/OwnTVDatabase.kt	stalkerDeviceId
 1	room-schema	core/src/main/java/tv/own/owntv/core/database/OwnTVDatabase.kt	stalkerDeviceId2
 1	room-schema	core/src/main/java/tv/own/owntv/core/database/OwnTVDatabase.kt	stalkerSerialNumber
@@ -1450,6 +1453,7 @@
 1	room-schema	core/src/main/java/tv/own/owntv/core/database/dao/SourceDao.kt	SELECT s.* FROM sources s
 1	room-schema	core/src/main/java/tv/own/owntv/core/database/dao/SourceDao.kt	SELECT sourceId FROM profile_source WHERE profileId = :profileId
 1	sql	core/src/main/java/tv/own/owntv/core/database/dao/SourceDao.kt	UPDATE sources SET catchupTimezone = :mode, catchupOffsetMin = :offsetMin WHERE id = :id
+1	sql	core/src/main/java/tv/own/owntv/core/database/dao/SourceDao.kt	UPDATE sources SET enabled = :enabled WHERE id = :id
 2	room-schema	core/src/main/java/tv/own/owntv/core/database/dao/SourceDao.kt	UPDATE sources SET hlsSupported = :hlsSupported WHERE id = :id
 1	sql	core/src/main/java/tv/own/owntv/core/database/dao/SourceDao.kt	UPDATE sources SET httpReferer = :referer WHERE id = :id
 1	room-schema	core/src/main/java/tv/own/owntv/core/database/dao/SourceDao.kt	UPDATE sources SET lastSyncAt = :timestamp WHERE id = :id
@@ -1555,7 +1559,7 @@
 1	room-schema	core/src/main/java/tv/own/owntv/core/database/entity/MetadataEntities.kt	metadata_match
 1	room-schema	core/src/main/java/tv/own/owntv/core/database/entity/MetadataEntities.kt	tmdbId
 2	room-schema	core/src/main/java/tv/own/owntv/core/database/entity/MetadataEntities.kt	updatedAt
-1	sql	core/src/main/java/tv/own/owntv/core/database/entity/ProfileEntities.kt	1
+2	room-schema	core/src/main/java/tv/own/owntv/core/database/entity/ProfileEntities.kt	1
 2	room-schema	core/src/main/java/tv/own/owntv/core/database/entity/ProfileEntities.kt	id
 2	room-schema	core/src/main/java/tv/own/owntv/core/database/entity/ProfileEntities.kt	profileId
 1	room-schema	core/src/main/java/tv/own/owntv/core/database/entity/ProfileEntities.kt	profile_source
@@ -4540,6 +4544,8 @@
 1	log	core/src/main/java/tv/own/owntv/core/sync/work/CatalogSyncWorker.kt	Launcher refresh failed profileId=$profileId sourceId=${source.id} ms=${SystemClock.elapsedRealtime() - launcherStartedAt}
 1	log	core/src/main/java/tv/own/owntv/core/sync/work/CatalogSyncWorker.kt	Launcher refresh profileId=$profileId sourceId=${source.id} ms=${SystemClock.elapsedRealtime() - launcherStartedAt}
 1	log	core/src/main/java/tv/own/owntv/core/sync/work/CatalogSyncWorker.kt	Progress emit total=${stage.totalProcessed} live=${stage.liveProcessed}
+1	log	core/src/main/java/tv/own/owntv/core/sync/work/CatalogSyncWorker.kt	Skipping disabled playlist after playback wait sourceId=$sourceId
+1	log	core/src/main/java/tv/own/owntv/core/sync/work/CatalogSyncWorker.kt	Skipping disabled playlist sync sourceId=$sourceId
 1	log	core/src/main/java/tv/own/owntv/core/sync/work/CatalogSyncWorker.kt	Source $sourceId not found — skipping ($reason)
 1	log	core/src/main/java/tv/own/owntv/core/sync/work/CatalogSyncWorker.kt	SourceRepository.sync finished sourceId=${source.id} result=${result.name()} ms=${SystemClock.elapsedRealtime() - syncStartedAt}
 1	log	core/src/main/java/tv/own/owntv/core/sync/work/CatalogSyncWorker.kt	Staged initial sync complete — markSynced sourceId=${source.id}

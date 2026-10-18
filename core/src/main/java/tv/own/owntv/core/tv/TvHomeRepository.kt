@@ -88,7 +88,7 @@ class TvHomeRepository(
     private fun TvProviderProgramEntity.describe(): String =
         "providerId=${providerProgramId ?: -1} surface=$surface mediaType=$mediaType groupId=$groupId targetItemId=$targetItemId lastPositionMs=$lastPositionMs durationMs=$durationMs lastPublishedAt=$lastPublishedAt"
 
-    suspend fun refreshProfile(profileId: Long, allowBrowsableRequest: Boolean = false) = withContext(Dispatchers.IO) {
+    suspend fun refreshProfile(profileId: Long, allowBrowsableRequest: Boolean = false, forceRecentLive: Boolean = false) = withContext(Dispatchers.IO) {
         if (profileId < 0) return@withContext
         val enabled = settings.androidTvHomeEnabled.first()
         logD("refreshProfile profile=$profileId enabled=$enabled allowBrowsable=$allowBrowsableRequest")
@@ -100,7 +100,7 @@ class TvHomeRepository(
         mutex.withLock {
             logD("refreshProfile profile=$profileId publishing Watch Next and Recent Live rows")
             refreshWatchNextLocked(profileId)
-            refreshRecentLiveLocked(profileId, allowBrowsableRequest)
+            refreshRecentLiveLocked(profileId, allowBrowsableRequest, force = forceRecentLive)
         }
         logD("refreshProfile profile=$profileId done")
     }
@@ -182,7 +182,7 @@ class TvHomeRepository(
         if (!force && now - channelRow.lastPublishedAt < RECENT_LIVE_REFRESH_INTERVAL_MS) return
 
         val liveSourceIds = sourceDao.observeForProfile(profileId).first()
-            .filter { it.syncLive }
+            .filter { it.enabled && it.syncLive }
             .map { it.id }
             .toSet()
         val recentChannels = channelDao.recentlyWatched(profileId, RECENT_LIVE_MAX_ITEMS * 2).first()

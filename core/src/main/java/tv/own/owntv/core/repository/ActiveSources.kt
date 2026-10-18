@@ -50,10 +50,11 @@ fun activeProfileSources(
                 flowOf(ActiveProfileSources(pid, emptyList()))
             } else {
                 combine(sourceDao.observeForProfile(pid), settings.defaultSourceId) { srcs, defaultId ->
-                    val filtered = if (defaultId > 0 && srcs.any { it.id == defaultId }) {
-                        srcs.filter { it.id == defaultId }
+                    val enabled = srcs.filter { it.enabled }
+                    val filtered = if (defaultId > 0 && enabled.any { it.id == defaultId }) {
+                        enabled.filter { it.id == defaultId }
                     } else {
-                        srcs
+                        enabled
                     }
                     filtered.forEach(::seedSessionLimit)
                     ActiveProfileSources(pid, filtered)
@@ -94,10 +95,11 @@ suspend fun activeSourceIds(
 ): List<Long> {
     val all = sourceDao.observeForProfile(profileId).first()
     val defaultId = settings.defaultSourceId.first()
-    val filtered = if (defaultId > 0 && all.any { it.id == defaultId }) {
-        all.filter { it.id == defaultId }
+    val enabled = all.filter { it.enabled }
+    val filtered = if (defaultId > 0 && enabled.any { it.id == defaultId }) {
+        enabled.filter { it.id == defaultId }
     } else {
-        all
+        enabled
     }
     val scoped = when (section) {
         MediaType.LIVE -> filtered.filter { it.syncLive }

@@ -63,6 +63,7 @@ class AutoRefresh(
         val playlistModes = settings.playlistAutoRefresh.first()
         if (playlistModes.isNotEmpty()) {
             sourceRepository.observeSources(pid).first().forEach { source ->
+                if (!source.enabled) return@forEach
                 val mode = playlistModes[source.id] ?: PlaylistRefresh.OFF
                 if (shouldRefresh(mode, source.lastSyncAt, nowMs, includeStartup)) {
                     val counts = importFinalizer.contentCounts(source.id)

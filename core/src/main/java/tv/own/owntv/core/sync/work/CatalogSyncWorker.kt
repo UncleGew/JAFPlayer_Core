@@ -58,6 +58,11 @@ class CatalogSyncWorker(
             Log.w(TAG, "Source $sourceId not found — skipping ($reason)")
             return Result.failure()
         }
+        if (!source.enabled) {
+            Log.i(TAG, "Skipping disabled playlist sync sourceId=$sourceId")
+            return Result.success()
+        }
+
         // An automatic refresh never runs under a film or channel: it waits until playback stops
         // (WorkManager restarts it later if the wait outlives the job's time limit).
         if (reason == tv.own.owntv.core.sync.AutoRefresh.REASON && watchSession.watching.value.isNotEmpty()) {
@@ -65,6 +70,10 @@ class CatalogSyncWorker(
             watchSession.awaitIdle()
         }
 
+        if (sourceDao.getById(sourceId)?.enabled != true) {
+            Log.i(TAG, "Skipping disabled playlist after playback wait sourceId=$sourceId")
+            return Result.success()
+        }
         val effective = contentTypes.effectiveFor(source)
         Log.i(
             TAG,

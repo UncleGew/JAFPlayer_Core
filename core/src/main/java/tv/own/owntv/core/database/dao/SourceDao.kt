@@ -19,6 +19,10 @@ interface SourceDao {
     @Update
     suspend fun update(source: SourceEntity)
 
+    /** Enable or disable one playlist without changing its credentials or section settings. */
+    @Query("UPDATE sources SET enabled = :enabled WHERE id = :id")
+    suspend fun setEnabled(id: Long, enabled: Boolean)
+
     @Delete
     suspend fun delete(source: SourceEntity)
 

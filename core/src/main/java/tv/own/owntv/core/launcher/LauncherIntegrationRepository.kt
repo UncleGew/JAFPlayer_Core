@@ -11,8 +11,15 @@ class LauncherIntegrationRepository(
 ) {
     suspend fun buildSnapshot(profileId: Long): LauncherSnapshot = planner.buildSnapshot(profileId)
 
-    suspend fun refreshProfile(profileId: Long, allowBrowsableRequest: Boolean = false) =
-        tvHomeRepository.refreshProfile(profileId, allowBrowsableRequest)
+    suspend fun refreshProfile(
+        profileId: Long,
+        allowBrowsableRequest: Boolean = false,
+        forceRecentLive: Boolean = false,
+    ) = tvHomeRepository.refreshProfile(
+        profileId,
+        allowBrowsableRequest,
+        forceRecentLive = forceRecentLive,
+    )
 
     suspend fun clearProfile(profileId: Long) = tvHomeRepository.clearProfile(profileId)
 

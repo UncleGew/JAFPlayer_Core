@@ -62,6 +62,8 @@ data class SourceEntity(
     val userAgent: String? = null,
     /** XMLTV guide URL (M3U `url-tvg` or manually entered); Xtream EPG comes from the API. */
     val epgUrl: String? = null,
+    /** Master playlist switch; preserves individual Live, Movies and Series settings. */
+    @ColumnInfo(defaultValue = "1") val enabled: Boolean = true,
     /**
      * enabledScope (v17). `false` = never fetch AND never show this section for this source.
      * Cache + user data are retained — Off is a sync/visibility scope, not a deletion.

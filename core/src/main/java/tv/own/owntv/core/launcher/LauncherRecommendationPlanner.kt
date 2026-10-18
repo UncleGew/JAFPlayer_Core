@@ -118,7 +118,7 @@ class LauncherRecommendationPlanner(
     }
 
     suspend fun sourcesForProfile(profileId: Long): List<tv.own.owntv.core.database.entity.SourceEntity> =
-        sourceDao.observeForProfile(profileId).first()
+        sourceDao.observeForProfile(profileId).first().filter { it.enabled }
 
     suspend fun sourceIdsForProfile(profileId: Long): Set<Long> = sourcesForProfile(profileId).map { it.id }.toSet()
 

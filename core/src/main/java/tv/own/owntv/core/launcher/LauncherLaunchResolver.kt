@@ -24,7 +24,7 @@ class LauncherLaunchResolver(
     private val profileDao: ProfileDao,
 ) {
     suspend fun resolveLaunch(profileId: Long, deepLink: LauncherDeepLink): LauncherLaunch? = withContext(Dispatchers.IO) {
-        val sources = sourceDao.observeForProfile(profileId).first()
+        val sources = sourceDao.observeForProfile(profileId).first().filter { it.enabled }
         if (sources.isEmpty()) return@withContext null
         val liveIds = sources.filter { it.syncLive }.map { it.id }.toSet()
         val movieIds = sources.filter { it.syncMovies }.map { it.id }.toSet()

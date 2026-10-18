@@ -3419,4 +3419,7 @@
         <item quantity="one">catch-up on <xliff:g id="count">%1$s</xliff:g></item>
         <item quantity="other">catch-up on <xliff:g id="count">%1$s</xliff:g></item>
     </plurals>
+    <string name="settings_sources_disabled">Disabled</string>
+    <string name="settings_sources_disable_playlist">Disable playlist</string>
+    <string name="settings_sources_enable_playlist">Enable playlist</string>
 </resources>
